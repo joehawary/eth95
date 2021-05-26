@@ -8,7 +8,6 @@ import OutputLog from "../../containers/OutputLog";
 import ContractAddress from "../../containers/ContractAddress";
 import Contracts from "../../containers/Contracts";
 import Signers from "../../containers/Signers";
-import wallet from "../../containers/Connection";
 
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
 //var Web3 = require('web3');
@@ -58,7 +57,7 @@ const useCallFunction = (args, types, fn, opts) => {
     if (fn.stateMutability !== "view" && fn.constant !== true) {
 
 
-      if (Wallet.name = 'MetaMask') {
+      if (Wallet.name == 'MetaMask') {
         var method = "personal_sign";
       } else {
         var method = "eth_sign";
