@@ -26,8 +26,8 @@ const onboard = Onboard({
   networkId: 1,  // [Integer] The Ethereum network ID your Dapp uses.
   subscriptions: {
     wallet: wallet => {
-        window.localStorage.setItem('selectedWallet', wallet.name),
-        web3 = new Web3(wallet.provider)
+        window.localStorage.setItem('selectedWallet', wallet.name)
+        //web3 = new Web3(wallet.provider)
     }
   },
   walletSelect: {

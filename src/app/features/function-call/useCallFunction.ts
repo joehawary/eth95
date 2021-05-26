@@ -1,4 +1,4 @@
-import { ethers, providers } from "ethers";
+import { ethers, providers, Wallet } from "ethers";
 import abiDecoder from "abi-decoder";
 import { SignatureLike } from '@ethersproject/bytes'
 import { PopulatedTransaction } from '@ethersproject/contracts'
@@ -11,8 +11,8 @@ import Signers from "../../containers/Signers";
 import wallet from "../../containers/Connection";
 
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
-var Web3 = require('web3');
-let library;
+//var Web3 = require('web3');
+//let library;
 
 
 const useCallFunction = (args, types, fn, opts) => {
@@ -58,7 +58,7 @@ const useCallFunction = (args, types, fn, opts) => {
     if (fn.stateMutability !== "view" && fn.constant !== true) {
 
 
-      if (wallet.name = 'MetaMask') {
+      if (Wallet.name = 'MetaMask') {
         var method = "personal_sign";
       } else {
         var method = "eth_sign";
