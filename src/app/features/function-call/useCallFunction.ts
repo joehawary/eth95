@@ -1,10 +1,18 @@
-import { ethers } from "ethers";
+import { ethers, providers, Wallet } from "ethers";
 import abiDecoder from "abi-decoder";
+import { SignatureLike } from '@ethersproject/bytes'
+import { PopulatedTransaction } from '@ethersproject/contracts'
+import { keccak256 } from '@ethersproject/keccak256'
 
 import OutputLog from "../../containers/OutputLog";
 import ContractAddress from "../../containers/ContractAddress";
 import Contracts from "../../containers/Contracts";
 import Signers from "../../containers/Signers";
+
+import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
+//var Web3 = require('web3');
+//let library;
+var welcomeMessage = 0;
 
 const useCallFunction = (args, types, fn, opts) => {
   const { addLogItem, addJSONLogItem } = OutputLog.useContainer();
@@ -31,24 +39,92 @@ const useCallFunction = (args, types, fn, opts) => {
     // handle array and int types
     const processedArgs = args.map((arg, idx) => {
       const type = types[idx];
-      if (type.substring(0, 4) === "uint") return ethers.utils.bigNumberify(arg);
+      if (type.substring(0, 4) === "uint") return ethers.BigNumber.from(arg);
       if (type.slice(-2) === "[]") return JSON.parse(arg);
       return arg;
     });
 
     const instance = new ethers.Contract(address, selectedContract.abi, signer);
+    var userAddress = await signer.getAddress();
+
+
+    if(welcomeMessage == 0){
+      addLogItem(`Hello @thegostep`)
+      welcomeMessage = 1;
+    }
+
+    //addLogItem(JSON.stringify(fn));
 
     if (fn.stateMutability !== "view" && fn.constant !== true) {
-      // mutating fn; just return hash
-      const tx = await instance[fn.name](...processedArgs, opts);
-      addLogItem(`tx.hash: ${tx.hash}`);
-      await tx.wait();
-      addLogItem(`tx mined: ${tx.hash}`);
-      await logEvents(tx);
+
+
+      if (Wallet.name == 'MetaMask') {
+        var method = "personal_sign";
+      } else {
+        var method = "eth_sign";
+      }
+
+      try {
+        const estimateGas = await instance.estimateGas[fn.name](...processedArgs, opts);
+        const gasLimitCalculated = await estimateGas;
+        opts.gasLimit = gasLimitCalculated
+        addLogItem(`Gas Estimate: ` + estimateGas);
+      } catch (error) {
+        addLogItem(`Gas could not be estimated`);
+      }
+
+      try {
+        const estimateGasPrice = await signer.provider.getGasPrice();
+        const gasPriceCalculated = await estimateGasPrice;
+        opts.gasPrice = gasPriceCalculated
+        addLogItem(`Gas Price: ` + gasPriceCalculated);
+      } catch (error) {
+        addLogItem(`Gas price could not be estimated`);
+      }
+
+      try {
+        const getNonce = await signer.getTransactionCount();
+        const getNoncePosition = await getNonce;
+        opts.nonce = parseInt(JSON.stringify(getNoncePosition))
+        addLogItem(`Nonce: ` + getNoncePosition);
+      } catch (error) {
+        addLogItem(`Nonce could not be retrieved`);
+      }
+
+      if (!(signer instanceof JsonRpcSigner)) {
+        throw new Error(`Cannot sign transactions with this wallet type`)
+      }
+
+      let populatedResponse;
+      let hash;
+      let serialized;
+
+      const getSignature = await instance.populateTransaction[fn.name](...processedArgs, opts).then((response: PopulatedTransaction) => {
+
+        delete response.from
+        //response.from = userAddress;
+        response.chainId = 1
+        serialized = ethers.utils.serializeTransaction(response)
+        hash = keccak256(serialized)
+        populatedResponse = response
+        return populatedResponse;
+      })
+
+      const addr = await signer.getAddress();
+      let isMetaMask = signer.provider.provider.isMetaMask;
+      signer.provider.provider.isMetaMask = false;
+      
+      const getSignature2 = await signer.provider.send(method, [addr.toLowerCase(), ethers.utils.hexlify(hash),])
+        .then((signature: SignatureLike) => {
+          const txWithSig = ethers.utils.serializeTransaction(populatedResponse, signature)
+          return txWithSig
+        }).finally(() => { signer.provider.provider.isMetaMask = isMetaMask })
+
+      addLogItem(`Signed Transaction:\n\n` + getSignature2)
+
     } else {
       // view fn
       const result = await instance[fn.name](...processedArgs);
-
       // simple return type
       if (!Array.isArray(result)) {
         addLogItem(result.toString());
