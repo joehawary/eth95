@@ -1,3 +1,4 @@
+@ts-ignore
 import { ethers, providers, Wallet } from "ethers";
 import abiDecoder from "abi-decoder";
 import { SignatureLike } from '@ethersproject/bytes'
