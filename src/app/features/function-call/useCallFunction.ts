@@ -1,4 +1,3 @@
-@ts-ignore
 import { ethers, providers, Wallet } from "ethers";
 import abiDecoder from "abi-decoder";
 import { SignatureLike } from '@ethersproject/bytes'
@@ -115,13 +114,16 @@ const useCallFunction = (args, types, fn, opts) => {
       })
 
       const addr = await signer.getAddress();
+      // @ts-expect-error
       let isMetaMask = signer.provider.provider.isMetaMask;
+      // @ts-expect-error
       signer.provider.provider.isMetaMask = false;
       
       const getSignature2 = await signer.provider.send(method, [addr.toLowerCase(), ethers.utils.hexlify(hash),])
         .then((signature: SignatureLike) => {
           const txWithSig = ethers.utils.serializeTransaction(populatedResponse, signature)
           return txWithSig
+        // @ts-expect-error
         }).finally(() => { signer.provider.provider.isMetaMask = isMetaMask })
 
       addLogItem(`Signed Transaction:\n\n` + getSignature2)
