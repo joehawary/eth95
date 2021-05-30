@@ -66,8 +66,7 @@ const useCallFunction = (args, types, fn, opts) => {
 
       try {
         const estimateGas = await instance.estimateGas[fn.name](...processedArgs, opts);
-        const gasLimitCalculated = await estimateGas;
-        opts.gasLimit = gasLimitCalculated
+        opts.gasLimit = estimateGas
         addLogItem(`Gas Estimate: ` + estimateGas);
       } catch (error) {
         addLogItem(`Gas could not be estimated`);
@@ -75,11 +74,15 @@ const useCallFunction = (args, types, fn, opts) => {
 
       try {
         const estimateGasPrice = await signer.provider.getGasPrice();
-        const gasPriceCalculated = await estimateGasPrice;
-        opts.gasPrice = gasPriceCalculated
-        addLogItem(`Gas Price: ` + gasPriceCalculated);
+        opts.gasPrice = estimateGasPrice
+        addLogItem(`Gas Price: ` + estimateGasPrice);
       } catch (error) {
         addLogItem(`Gas price could not be estimated`);
+      }
+
+      if (opts.gasPrice > 0 && opts.gasLimit > 0) {
+        let gasCost = opts.gasLimit*opts.gasPrice;
+        addLogItem(`MAX Gas Cost: ` + ethers.utils.formatEther(JSON.stringify(gasCost)));
       }
 
       try {
