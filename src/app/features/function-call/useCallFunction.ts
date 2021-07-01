@@ -49,7 +49,7 @@ const useCallFunction = (args, types, fn, opts) => {
 
 
     if(welcomeMessage == 0){
-      addLogItem(`Hello @thegostep`)
+      addLogItem(`Hello, welcome!`)
       welcomeMessage = 1;
     }
 
