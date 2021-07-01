@@ -9,6 +9,7 @@ import EncodeButton from "./EncodeButton";
 import useFormData from "./useFormData";
 import useCallFunction from "./useCallFunction";
 import useCallFunction2 from "./useCallFunction2";
+import useCallFunction3 from "./useCallFunction3";
 
 const Container = styled(Fieldset)`
   flex-grow: 1;
@@ -60,6 +61,7 @@ const FunctionForm = ({ fn }) => {
   // get the function to call when user hits submit
   const { callFunction } = useCallFunction(args, types, fn, opts);
   const { callFunction2 } = useCallFunction2(args, types, fn, opts);
+  const { callFunction3 } = useCallFunction3(args, types, fn, opts);
 
   // clear formState when function changes
   useEffect(() => {
@@ -90,6 +92,15 @@ const FunctionForm = ({ fn }) => {
   const handleSubmit2 = async () => {
     try {
       await callFunction2();
+    } catch (error) {
+      console.error(error);
+      addLogItem(`Error: ${error.message}`);
+    }
+  };
+
+  const handleSubmit3 = async () => {
+    try {
+      await callFunction3();
     } catch (error) {
       console.error(error);
       addLogItem(`Error: ${error.message}`);
@@ -130,6 +141,9 @@ const FunctionForm = ({ fn }) => {
           </Button>
           <Button onClick={handleSubmit2} className="function-submit-btn">
             Submit (TX)
+          </Button>
+          <Button onClick={handleSubmit3} className="function-submit-btn">
+            Create Bytes
           </Button>
           <EncodeButton
             args={args}
