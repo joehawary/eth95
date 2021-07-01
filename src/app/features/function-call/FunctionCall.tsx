@@ -114,7 +114,7 @@ const FunctionForm = ({ fn }) => {
           <div key={input.name} style={{ marginBottom: `1rem` }}>
             <div>{input.name}:</div>
             <Input
-              type={input.type.substring(0, 4) === "uint" ? "number" : "text"}
+              type={input.type.slice(-2) !== "[]" && input.type.substring(0, 4) === "uint" ? "number" : "text"}
               placeholder={input.type}
               value={formState[idx] || ""}
               onChange={(e) => handleInputChange(idx, e.target.value)}
