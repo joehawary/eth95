@@ -7,7 +7,7 @@
 ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚════╝ ╚══════╝
 ```                                         
 
-[![circle ci](https://badgen.net/circleci/github/adrianmcli/eth95)](https://circleci.com/gh/adrianmcli/eth95)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/ab95b627-1e38-44a8-a143-a00aeb556cdf/deploy-status)](https://app.netlify.com/sites/frosty-volhard-dfe839/deploys)[![circle ci](https://badgen.net/circleci/github/adrianmcli/eth95)](https://circleci.com/gh/adrianmcli/eth95)
 [![npm version](https://badgen.net/npm/v/eth95)](https://www.npmjs.com/package/eth95)
 ![MIT licensed](https://badgen.net/badge/license/MIT/blue)
 
