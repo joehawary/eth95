@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 import { Fieldset, Panel } from "react95";
 
@@ -39,8 +40,19 @@ const FooterPanel = styled(Panel)`
 `;
 
 const Main = () => {
-  const { selectedContract: contract } = Contracts.useContainer();
-  useQueryStringContract()
+  const { selectedContract: contract, overwriteContract } =
+    Contracts.useContainer();
+  useQueryStringContract();
+
+  useEffect(() => {
+    const contracts = localStorage.getItem("contracts");
+    if (!contracts) {
+      return;
+    }
+    const result = `{"data":${contracts}}`;
+    let jsonResult = JSON.parse(result).data;
+    overwriteContract(jsonResult);
+  }, []);
 
   return (
     <Container>
